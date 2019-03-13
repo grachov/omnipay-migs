@@ -2,11 +2,22 @@
 
 namespace Omnipay\Migs\Message;
 
+use Omnipay\Common\CreditCard;
+use Omnipay\Common\Exception\InvalidCreditCardException;
+
 /**
  * GoCardless Abstract Request
  */
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
+    private static $brands = [
+        CreditCard::BRAND_AMEX => 'Amex',
+        CreditCard::BRAND_DINERS_CLUB => 'Dinersclub',
+        CreditCard::BRAND_JCB => 'JCB',
+        CreditCard::BRAND_MAESTRO => 'Maestro',
+        CreditCard::BRAND_MASTERCARD => 'Mastercard',
+        CreditCard::BRAND_VISA => 'Visa',
+    ];
     protected $endpoint = 'https://migs.mastercard.com.au/';
     protected $endpointTEST = 'https://migs-mtf.mastercard.com.au/';
 
@@ -104,7 +115,14 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     {
         $card = $this->getCard();
 
+        $brand = $card->getBrand();
+        if (!isset(self::$brands[$brand])) {
+            throw new InvalidCreditCardException('Card brand is invalid');
+        }
+
         return [
+            'vpc_card' => self::$brands[$brand],
+            'vpc_Gateway' => 'ssl',
             'vpc_CardNum' => $card->getNumber(),
             'vpc_CardExp' => $card->getExpiryDate('ym'),
             'vpc_CardSecurityCode' => $card->getCvv(),
