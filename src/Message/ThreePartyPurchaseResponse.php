@@ -11,12 +11,14 @@ use Omnipay\Common\Message\RedirectResponseInterface;
  */
 class ThreePartyPurchaseResponse extends AbstractResponse implements RedirectResponseInterface
 {
-    protected $redirectUrl;
+    protected $endpointUrl;
+    protected $hasCard;
 
-    public function __construct(RequestInterface $request, $data, $redirectUrl)
+    public function __construct(RequestInterface $request, $data, $endpointUrl, $hasCard = false)
     {
         parent::__construct($request, $data);
-        $this->redirectUrl = $redirectUrl;
+        $this->endpointUrl = $endpointUrl;
+        $this->hasCard = $hasCard;
     }
 
     public function isSuccessful()
@@ -31,16 +33,16 @@ class ThreePartyPurchaseResponse extends AbstractResponse implements RedirectRes
 
     public function getRedirectUrl()
     {
-        return $this->redirectUrl;
+        return $this->endpointUrl . ($this->hasCard ? '' : '?'.http_build_query($this->getData()));
     }
 
     public function getRedirectMethod()
     {
-        return 'GET';
+        return $this->hasCard ? 'POST' : 'GET';
     }
 
     public function getRedirectData()
     {
-        return $this->getData();
+        return $this->hasCard ? $this->getData() : [];
     }
 }
