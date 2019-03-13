@@ -15,10 +15,7 @@ class TwoPartyPurchaseRequest extends AbstractRequest
 
         $this->getCard()->validate();
 
-        $data = $this->getBaseData();
-        $data['vpc_CardNum'] = $this->getCard()->getNumber();
-        $data['vpc_CardExp'] = $this->getCard()->getExpiryDate('ym');
-        $data['vpc_CardSecurityCode'] = $this->getCard()->getCvv();
+        $data = array_merge($this->getBaseData(), $this->getCardData());
         $data['vpc_SecureHash']  = $this->calculateHash($data);
         $data['vpc_SecureHashType']  = 'SHA256';
 

@@ -13,7 +13,16 @@ class ThreePartyPurchaseRequest extends AbstractRequest
     {
         $this->validate('amount', 'returnUrl', 'transactionId');
 
+        $card = $this->getCard();
+
+        if ($card) {
+            $this->getCard()->validate();
+        }
+
         $data = $this->getBaseData();
+        if ($card) {
+            $data = array_merge($data, $this->getCardData());
+        }
         $data['vpc_SecureHash']  = $this->calculateHash($data);
         $data['vpc_SecureHashType']  = 'SHA256';
 

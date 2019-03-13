@@ -100,6 +100,17 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $data;
     }
 
+    protected function getCardData()
+    {
+        $card = $this->getCard();
+
+        return [
+            'vpc_CardNum' => $card->getNumber(),
+            'vpc_CardExp' => $card->getExpiryDate('ym'),
+            'vpc_CardSecurityCode' => $card->getCvv(),
+        ];
+    }
+
     public function getEndpoint()
     {
         return $this->endpoint;
